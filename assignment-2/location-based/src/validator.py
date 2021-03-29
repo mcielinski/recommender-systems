@@ -3,14 +3,13 @@ import pandas as pd
 from tqdm import tqdm
 
 from .utils import find_nearest_point, get_grid
-from.model import Model
+from.models import Model
 
 
 class Validator:
 
     def __init__(
         self,
-        model: Model,
         orders: pd.DataFrame,
         # columns: latitiude, longitude, vendor_id
         vendors: pd.DataFrame,
@@ -21,8 +20,6 @@ class Validator:
         random_seed: int = 123
     ):
         tqdm.pandas()
-
-        self.model = model
 
         # make grid
         print()
@@ -58,23 +55,28 @@ class Validator:
         orders = orders[['point', 'vendor_id']]
         test_mask = orders['point'].isin(self.test_points)
         self.test_orders = orders[test_mask]
-        train_orders = orders[~test_mask]
-
-        # fit model
-        print()
-        print('Fitting model...')
-        self.model.fit(
-            train_orders,
-            self.grid_points
-        )
+        self.train_orders = orders[~test_mask]
 
         print()
         print('Validator is ready!')
 
     def validate(
         self,
+        model: Model,
         n_recomendations: int
     ):
+
+        # fit model
+        print()
+        print('Fitting model...')
+        model.fit(
+            self.train_orders,
+            self.grid_points
+        )
+
+        # predict and validate
+        print()
+        print('Validating model...')
 
         n_relevant_items = 0
         n_recommended_items = 0
@@ -95,7 +97,7 @@ class Validator:
             )
 
             # make recommendations
-            recommended_vendors = self.model.predict(
+            recommended_vendors = model.predict(
                 location,
                 n_recomendations
             )
