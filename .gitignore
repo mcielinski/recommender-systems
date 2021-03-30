@@ -151,6 +151,5 @@ cython_debug/
 
 # other
 */data/*.csv
-*/data/*.txt
 hybrid_approach_2.ipynb
 d2v_2.ipynb
