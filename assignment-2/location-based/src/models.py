@@ -203,7 +203,6 @@ class GravityModel(Model):
             ),
             axis=1
         )
-        self.vendors = self.vendors.sort_values('distance')
 
         # fill mising ratings with mean
         self.vendors['vendor_rating'].fillna(
